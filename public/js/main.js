@@ -1,7 +1,16 @@
 (async function (doc){
 	const {button, div, pre} = van.tags
 
+	let canvas;
+	let gl;
+	if (typeof document !== 'undefined') {
+		canvas = document.createElement('canvas');
+		canvas.width = 200;
+		canvas.height = 100;
+		gl = canvas.getContext('webgl');
+	}
 	let parserDom;
+
 	/**
 	 * @param html
 	 * @return {HTMLElement}
@@ -45,6 +54,54 @@
 		'Mozilla/5.0 (Linux; Android 7.0; ADMIRE_SENSE+) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Mobile Safari/537.36',
 	];
 
+	/**
+	 * get gpu name
+	 * @returns {string|null}
+	 */
+	function getGPUName() {
+		return gl
+			? gl.getParameter(gl.getExtension(
+				'WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL)
+			: null;
+	}
+
+	/**
+	 * get device pixel ratio
+	 */
+	function getRatio() {
+		return window.devicePixelRatio;
+	}
+
+	/**
+	 * get device width of the screen in pixels
+	 */
+	function getWidth() {
+		return window.screen.width;
+	}
+
+	/**
+	 * get device height of the screen in pixels
+	 */
+	function getHeight() {
+		return window.screen.height;
+	}
+
+	/**
+	 * get device memory
+	 * @return {number|null}
+	 */
+	function getDeviceMemory() {
+		return navigator.deviceMemory ? navigator.deviceMemory : null;
+	}
+
+
+	/**
+	 * @param {string} selector
+	 * @return {Element}
+	 */
+	const qs = (selector) => {
+		return doc.querySelector(selector)
+	}
 
 	/**
 	 * load container and bind events
@@ -59,47 +116,82 @@
 		container.innerHTML = '';
 		van.add(container, html(response.data))
 
-		let $random = doc.querySelector("#random-ua");
-		let $currentUa = doc.querySelector('#current-ua');
-		let $btnDetect = doc.querySelector("#detect");
-		let $swithAboutDevice = doc.querySelector('#about-device');
-		let $swithIndexDevice = doc.querySelector('#index-device');
-		let $input = doc.querySelector("#useragent-input");
-		let $timebot = doc.querySelector("#time-bot-result");
-		let $timedevice = doc.querySelector("#time-device-result");
-		let $cleanHeaders = doc.querySelector('#clean-headers');
-		let $requestHeaders = doc.querySelector('#request-headers');
-		let $headers = doc.querySelector('#headers-input');
+		let $random = qs("#random-ua");
+		let $currentUa = qs('#current-ua');
+		let $btnDetect = qs("#detect");
+		let $switchAboutDevice = qs('#about-device');
+		let $switchTrustedDevice = qs('#trusted-device');
+		let $switchAliasDevice = qs('#alias-device');
+		let $switchIndexDevice = qs('#index-device');
+
+		let $input = qs("#useragent-input");
+
+		let $timebot = qs("#time-bot-result");
+		let $timedevice = qs("#time-device-result");
+
+		let $cleanHeaders = qs('#clean-headers');
+		let $requestHeaders = qs('#request-headers');
+		let $headers = qs('#headers-input');
+		let $share = qs('#share-input');
+
+		let $meta = qs('#meta-input');
+		let $cleanMeta = qs('#clean-meta');
+		let $requestMeta = qs('#request-meta');
 
 		let useragent = navigator.userAgent;
-		let useragentHash = decodeURIComponent(window.location.hash.substr(1));
-		if (useragentHash.trim() !== ''){
-			useragent = useragentHash;
-			$headers.value = '';
-		}
-		$input.value = useragent;
+		// restore data for hash link
+		let hash = window.location.hash.substr(1);
+		if (hash.trim() !== ''){
+			console.log({hash});
+			try {
+				let hashData = JSON.parse(atob(hash));
+				$headers.value = '';
+				$meta.value = '';
 
+				hashData.useragent && (useragent = hashData.useragent);
+				hashData.aboutDevice && ($switchAboutDevice.checked = true);
+				hashData.enableIndex && ($switchIndexDevice.checked = true);
+				hashData.enableTrusted && ($switchTrustedDevice.checked = true);
+				hashData.enableAlias && ($switchAliasDevice.checked = true);
+				hashData.meta && ($meta.value = hashData.meta)
+				hashData.headers && ($headers.value = hashData.headers)
+
+			} catch (e) {
+				console.log(e);
+			}
+
+		}
+
+		$input.value = useragent;
 
 		const renderDetect = async () => {
 			let useragent = $input.value;
-			let headers = $input.value;
-			let aboutDevice = $swithAboutDevice.checked
-			let enableIndex = $swithIndexDevice.checked;
-			window.location.hash = useragent;
+			let headers = $headers.value;
+			let meta = $meta.value;
+			let aboutDevice = $switchAboutDevice.checked
+			let enableIndex = $switchIndexDevice.checked;
+			let enableTrusted = $switchTrustedDevice.checked;
+			let enableAlias = $switchAliasDevice.checked;
+			let data = JSON.stringify( {
+				useragent,
+				aboutDevice,
+				enableIndex,
+				enableAlias,
+				enableTrusted,
+				headers,
+				meta
+			});
+
+			$share.value = window.location.href + '#' + btoa(data);
 
 			const response = await axios({
 				method: 'post',
 				url: "/api/device",
 				responseType: 'json',
-				data: JSON.stringify({
-					useragent,
-					aboutDevice,
-					enableIndex,
-					headers
-				})
+				data: data
 			})
-			const jsonData = response.data;
 
+			const jsonData = response.data;
 			$timebot.innerHTML = jsonData.botTime;
 			$timedevice.innerHTML = jsonData.deviceTime;
 
@@ -115,9 +207,12 @@
 					deviceHelper: jsonData.deviceHelper,
 				}
 			}).render("#output")
-
-
 		};
+
+		$currentUa.addEventListener('click', (e) => {
+			e.preventDefault();
+			$input.value = window.navigator.userAgent;
+		});
 
 		$btnDetect.addEventListener("click", (e) => {
 			e.preventDefault();
@@ -132,6 +227,23 @@
 			e.preventDefault();
 			$input.value = randmoUserAgentList[Math.floor(Math.random() * randmoUserAgentList.length)];
 		});
+
+		$requestMeta.addEventListener('click', (e) => {
+			e.preventDefault();
+			$meta.value = JSON.stringify({
+				width: getWidth(),
+				height: getHeight(),
+				ratio: getRatio(),
+				ram: getDeviceMemory(),
+				gpu: getGPUName(),
+			});
+		});
+
+		$cleanMeta.addEventListener('click', (e) => {
+			e.preventDefault();
+			$meta.value = '';
+		});
+
 
 		$cleanHeaders.addEventListener('click', (e) => {
 			e.preventDefault();
@@ -160,11 +272,6 @@
 			}
 		});
 
-		$currentUa.addEventListener('click', (e) => {
-			e.preventDefault();
-			$input.value = window.navigator.userAgent;
-		});
-
 	};
 
 	/**
@@ -174,7 +281,7 @@
 	const  initContainerIp = async () => {
 		const IP_CONTAINER = '#content-ip';
 		const URL = '/api/container/ip'
-		const container = doc.querySelector(IP_CONTAINER);
+		const container = qs(IP_CONTAINER);
 		container.innerHTML = 'loading ...'
 		const response = await axios({method: 'get', url: URL, responseType: 'text'})
 		container.innerHTML = '';

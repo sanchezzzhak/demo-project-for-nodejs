@@ -1,10 +1,25 @@
 const {AbstractController} = require('node-moleculer-web')
 
-
-/**
- *
- */
 class DetectController extends AbstractController {
+
+	#parseHeaders(headers) {
+		// is headers json from js
+		if (headers && headers.indexOf('{') !== -1) {
+			try  {
+				return JSON.parse(headers)
+			} catch (e) {
+				console.error(e)
+				return {};
+			}
+		}
+		// is header json client-hints string
+		let customHeaders = {};
+		headers.split("\n").forEach((item) => {
+			let partStr = item.split(":", 2);
+			customHeaders[partStr[0]] = partStr[1];
+		});
+		return customHeaders;
+	}
 
 	/**
 	 * detect device information
@@ -13,34 +28,21 @@ class DetectController extends AbstractController {
 	 */
 	async device() {
 		this.initRequest();
-
-		let jsonData = JSON.parse(await this.readBody())
-		let headers = 	jsonData.headers;
-		let customHeaders = {};
-
-    if (headers && headers.indexOf('{') !== -1) {
-      try  {
-        customHeaders = JSON.parse(headers)
-      } catch (e) {
-        console.error(e)
-      }
-    } else {
-      headers.split("\n").forEach((item) => {
-        let partStr = item.split(":", 2);
-        customHeaders[partStr[0]] = partStr[1];
-      });
-    }
+		const jsonData = JSON.parse(await this.readBody())
 
 		const deviceData = await this.broker.call('device-detector.detect', {
 			useragent: jsonData.useragent,
-			headers: customHeaders,
-			meta: jsonData.meta ?? {},
-			aboutDevice: jsonData.aboutDevice ?? false,
-			enableIndex: jsonData.enableIndex ?? false,
+			headers: this.#parseHeaders(jsonData.headers),
+			meta: jsonData.meta ?JSON.parse(jsonData.meta) : {},
+			info: jsonData.aboutDevice ?? false,
+			alias: jsonData.enableAlias ?? false,
+			trusted: jsonData.enableTrusted ?? false,
 		})
 
 		return this.asJson(deviceData, 200);
 	}
+
+
 
 	/**
 	 * detect ip information

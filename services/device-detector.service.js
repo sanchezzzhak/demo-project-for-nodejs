@@ -17,8 +17,8 @@ class DeviceDetectorService extends Service {
       created: this.createdService,
       actions: {
         async detect(cxt) {
-          const { useragent, headers, meta, enableIndex, aboutDevice} = cxt.params;
-          return this.getDeviceInfo(useragent, headers, meta, enableIndex, aboutDevice);
+          const {useragent, headers, meta, index, info, alias, trusted} = cxt.params;
+          return this.parse(useragent, headers, meta, index, info, alias, trusted);
         },
       },
     });
@@ -32,10 +32,12 @@ class DeviceDetectorService extends Service {
     this.clientHints = new ClientHints();
   }
 
-  getDeviceInfo(useragent, headers, meta, enableIndex = false, aboutDevice = false) {
 
-    this.detector.deviceIndexes = Boolean(enableIndex);
-    this.detector.clientIndexes = Boolean(enableIndex);
+  parse(useragent, headers, meta, index, info, alias, trusted) {
+    this.detector.deviceIndexes = Boolean(index);
+    this.detector.clientIndexes = Boolean(index);
+    this.detector.deviceAliasCode = Boolean(alias);
+    this.detector.deviceTrusted = Boolean(trusted);
 
     let time0 = new Date().getTime();
 
@@ -45,14 +47,10 @@ class DeviceDetectorService extends Service {
     let botResult = this.detector.parseBot(useragent);
     let time2 = new Date().getTime();
 
-    let deviceInfoResult = null;
-    if (aboutDevice) {
-      deviceInfoResult = infoDevice.info(
-        deviceResult.device.brand,
-        deviceResult.device.model
-      );
+    let deviceInfo = null;
+    if (info && result.device) {
+      deviceInfo = this.detector.getParseInfoDevice().info(result.device.brand, result.device.model);
     }
-
     let isDesktop = DeviceHelper.isDesktop(result);
     if (!isDesktop && result.device && result.device.type === '') {
       isDesktop = true;
@@ -64,7 +62,7 @@ class DeviceDetectorService extends Service {
       device: result,
       bot: botResult,
       botTime: time2 - time1 + " ms.",
-      deviceInfo: deviceInfoResult,
+      deviceInfo: deviceInfo,
       deviceHelper: {
         /* check device type feature phone (push-button telephones) */
         isFeaturePhone: DeviceHelper.isFeaturePhone(result),
