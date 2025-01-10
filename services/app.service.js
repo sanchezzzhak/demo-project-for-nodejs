@@ -1,6 +1,11 @@
 const { UwsServer } = require("node-moleculer-web");
 const { Service } = require("moleculer");
 const path = require("node:path");
+
+const DetectController = require('../controllers/detect')
+const ContainerController = require('../controllers/container')
+
+
 /**
  * @method getServerUws()
  */
@@ -14,6 +19,7 @@ class AppService extends Service {
         ip: process.env.APP_IP,
         portSchema: process.env.APP_PORT_SCHEMA,
         publicDir: path.resolve(__dirname + "/../public"),
+        publicIndex: 'index.html',
         controllers: {},
       },
       mixins: [UwsServer],
@@ -23,10 +29,20 @@ class AppService extends Service {
   }
 
   initControllers() {
-    this.settings.controllers = {};
+    this.settings.controllers = {
+      detect: DetectController,
+      container: ContainerController,
+    };
   }
 
   initRouters() {
+
+    this.createRoute('post /api/device #c:detect.device')
+    this.createRoute('post /api/ip #c:detect.ip')
+
+    this.createRoute('get /api/container/device #c:container.device')
+    this.createRoute('get /api/container/ip #c:container.ip')
+
     this.bindRoutes();
   }
 

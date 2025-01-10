@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+          integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+          crossorigin="anonymous"/>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+
+    <title>Demo of works</title>
+</head>
+<body>
+<div class="container">
+    <h2>Demo of works</h2>
+    <hr>
+
+
+    <ul class="nav nav-pills" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
+                    data-bs-target="#device-detector" type="button" role="tab"
+                    aria-controls="home" aria-selected="true">Node Device Detector
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
+                    data-bs-target="#ip-collection" type="button" role="tab"
+                    aria-controls="profile" aria-selected="false">Node Ip Collection
+            </button>
+        </li>
+    </ul>
+
+    <hr>
+
+    <div class="tab-content card-body" id="myTabContent">
+        <div class="tab-pane fade show active" id="device-detector" role="tabpanel" aria-labelledby="home-tab">
+            <p class="text-muted mt-2">
+                description
+            </p>
+            <ul class="list-unstyled">
+                <li>
+                    <a target="_blank" title="link github"
+                       href="https://github.com/sanchezzzhak/node-device-detector"><i class="fab fa-github"></i>
+                        node-device-detector</a></li>
+                <li>
+                    <a target="_blank" title="link npm" href="https://www.npmjs.com/package/node-device-detector"><i
+                            class="fab fa-npm"></i> node-device-detector</a>
+                </li>
+            </ul>
+
+            <div class="content-load" id="content-device"></div>
+        </div>
+        <div class="tab-pane fade" id="ip-collection" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="content-load" id="content-ip"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6"></div>
+        <div class="col-md-6"></div>
+    </div>
+</div>
+
+
+<style>
+    .badge-dark {
+        background: #000;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"
+        integrity="sha256-nPSCRFgdbLZIbWcC9zcikihPrvJImjvkGawbxwYGvnI=" crossorigin="anonymous"></script>
+<script type="text/javascript"
+        src="https://cdn.jsdelivr.net/gh/vanjs-org/van/public/van-1.5.3.nomodule.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@textea/json-viewer@3"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
