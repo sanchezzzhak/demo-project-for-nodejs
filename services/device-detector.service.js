@@ -32,7 +32,6 @@ class DeviceDetectorService extends Service {
     this.clientHints = new ClientHints();
   }
 
-
   parse(useragent, headers, meta, index, info, alias, trusted) {
     this.detector.deviceIndexes = Boolean(index);
     this.detector.clientIndexes = Boolean(index);

@@ -3,6 +3,7 @@ const ejs = require('ejs');
 const fs = require('node:fs');
 
 const detectorVersion = require("node-device-detector/package.json").version;
+const ipVersion = require("node-ip-collection/package.json").version;
 
 const TEMPLATES = {
 	device: fs.readFileSync(__dirname + '/../views/device.ejs', {encoding: 'utf-8'}),
@@ -12,6 +13,10 @@ const TEMPLATES = {
 
 class ContainerController extends AbstractController {
 
+	/**
+	 * render device container
+	 * @return {Promise<string>}
+	 */
 	async device() {
 		this.initRequest();
 		this.setClientHintsHeaders()
@@ -32,13 +37,14 @@ class ContainerController extends AbstractController {
 		return this.render({template: ejs.render(TEMPLATES.device, data)})
 	}
 
+	/**
+	 * render ip container
+	 * @return {Promise<string>}
+	 */
 	async ip() {
 		this.initRequest();
-
-		return this.render({
-			template: ejs.render(TEMPLATES.ip, {}),
-			// params: {},
-		})
+		const data = { version: ipVersion};
+		return this.render({template: ejs.render(TEMPLATES.ip, data)})
 	}
 
 }

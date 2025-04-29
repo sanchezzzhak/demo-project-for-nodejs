@@ -159,7 +159,6 @@
 			} catch (e) {
 				console.log(e);
 			}
-
 		}
 
 		$input.value = useragent;
@@ -278,7 +277,7 @@
 	 * load container and bind events
 	 * @return {Promise<void>}
 	 */
-	const  initContainerIp = async () => {
+	const initContainerIp = async () => {
 		const IP_CONTAINER = '#content-ip';
 		const URL = '/api/container/ip'
 		const container = qs(IP_CONTAINER);
@@ -286,6 +285,30 @@
 		const response = await axios({method: 'get', url: URL, responseType: 'text'})
 		container.innerHTML = '';
 		van.add(container, html(response.data))
+
+		let $ipUpdate = qs('#ip-update');
+		let $ipUpdateStatus = qs('#ip-update-status');
+		let $ipDetect = qs('#ip-detect');
+
+		const ipUpdateResult = async () => {
+			const response = await axios({
+				method: 'get',
+				url: "/api/ip-update",
+				responseType: 'json',
+			})
+			const data = response.data;
+			$ipUpdateStatus.innerHTML = `
+				last data: ${data.lastUpdate}
+				process: ${data.process ? 'running' : 'none'}
+				update: ${data.update ? 'yes' : 'no'}
+			`;
+		};
+
+		// send callback update database
+		$ipUpdate.addEventListener('click', (e) => {
+			ipUpdateResult()
+		});
+
 	};
 
 	/**

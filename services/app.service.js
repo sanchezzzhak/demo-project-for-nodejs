@@ -37,11 +37,14 @@ class AppService extends Service {
 
   initRouters() {
 
-    this.createRoute('post /api/device #c:detect.device')
-    this.createRoute('post /api/ip #c:detect.ip')
+    this.createRoute('get /api/ip-update #s:update-database.update')
+    this.createRoute('get /api/ip-stage #s:update-database.stage')
 
     this.createRoute('get /api/container/device #c:container.device')
     this.createRoute('get /api/container/ip #c:container.ip')
+
+    this.createRoute('post /api/device #c:detect.device')
+    this.createRoute('post /api/ip #c:detect.ip')
 
     this.bindRoutes();
   }

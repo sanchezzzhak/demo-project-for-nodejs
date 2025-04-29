@@ -19,7 +19,7 @@
     "dotenv": "^16.4.7",
     "node-moleculer-web": "^1.1.7",
     "node-ip-collection": "^1.0.3",
-    "node-device-detector": "^2.1.6",
+    "node-device-detector": "^2.2.1",
     "moleculer": "^0.14.35"
   }
 }

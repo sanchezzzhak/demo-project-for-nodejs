@@ -1,8 +1,6 @@
 
 <div>Current version installed <%= version %></div>
-
 <hr>
-
 <div class="row justify-content-start">
     <div class="col-sm-6">
         <div class="form-switch">
@@ -41,61 +39,55 @@
         </button> -->
     </div>
     <div class="col-12">
-        <div class="mb-3">
-            <div class="mb-1">
-                <a href="#" id="current-ua" class="btn btn-sm btn-dark">get current UA</a>
-                <a href="#" id="random-ua" class="btn btn-sm btn-dark">get random UA</a>
-            </div>
-            <div class="form-floating mb-3">
-                <textarea style="min-height: 150px;" class="form-control" id="useragent-input" rows="10"></textarea>
-                <label for="useragent-input">Useragent</label>
-            </div>
-
-            <div class="mb-1">
-                <a href="#" id="request-headers" class="btn btn-sm btn-dark">get headers</a>
-                <a href="#" id="clean-headers" class="btn btn-sm btn-dark">clean headers</a>
-            </div>
-            <div class="form-floating mb-3">
-                <textarea style="min-height: 150px;" class="form-control" id="headers-input" rows="10"><%=headers%></textarea>
-                <label for="headers-input">Headers</label>
-            </div>
-
-            <div class="mb-1">
-                <a href="#" id="request-meta" class="btn btn-sm btn-dark">get meta</a>
-                <a href="#" id="clean-meta" class="btn btn-sm btn-dark">clean meta</a>
-            </div>
-            <div class="form-floating mb-3">
-                <textarea style="min-height: 150px;" class="form-control" id="meta-input" rows="10"></textarea>
-                <label for="meta-input">Meta</label>
-            </div>
-
-
-
-            <div class="row justify-content-start">
-                <div class="col-sm-4">
-                    <button id="detect" class="btn btn-primary">detect</button>
-                </div>
-            </div>
+        <div class="mb-1">
+            <a href="#" id="current-ua" class="btn btn-sm btn-dark">get current UA</a>
+            <a href="#" id="random-ua" class="btn btn-sm btn-dark">get random UA</a>
         </div>
-    </div>
-
-    <hr>
-
-    <div class="mb-2">
-        Detect device <span class="badge badge-dark" id="time-device-result">0 ms</span>
-        Detect bot <span class="badge badge-dark" id="time-bot-result">0 ms</span>
-    </div>
-
-    <hr>
-
-    <div id="output" style="margin-bottom: 10px;"></div>
-
-    <div class="col-12">
         <div class="form-floating mb-3">
-            <textarea style="min-height: 100px; width: 100%" class="form-control" id="share-input" rows="10"></textarea>
-            <label for="share-input">Share url</label>
+            <textarea style="min-height: 150px;" class="form-control" id="useragent-input" rows="10"></textarea>
+            <label for="useragent-input">Useragent</label>
+        </div>
+
+        <div class="mb-1">
+            <a href="#" id="request-headers" class="btn btn-sm btn-dark">get headers</a>
+            <a href="#" id="clean-headers" class="btn btn-sm btn-dark">clean headers</a>
+        </div>
+        <div class="form-floating mb-3">
+            <textarea style="min-height: 150px;" class="form-control" id="headers-input" rows="10"><%=headers%></textarea>
+            <label for="headers-input">Headers</label>
+        </div>
+
+        <div class="mb-1">
+            <a href="#" id="request-meta" class="btn btn-sm btn-dark">get meta</a>
+            <a href="#" id="clean-meta" class="btn btn-sm btn-dark">clean meta</a>
+        </div>
+        <div class="form-floating mb-3">
+            <textarea style="min-height: 150px;" class="form-control" id="meta-input" rows="10"></textarea>
+            <label for="meta-input">Meta</label>
         </div>
     </div>
+</div>
 
+<div class="row justify-content-start">
+    <div class="col-sm-4">
+        <button id="detect" class="btn btn-primary">detect</button>
+    </div>
+</div>
 
+<hr>
+
+<div class="mb-2">
+    Detect device <span class="badge badge-dark" id="time-device-result">0 ms</span>
+    Detect bot <span class="badge badge-dark" id="time-bot-result">0 ms</span>
+</div>
+
+<hr>
+
+<div id="output" style="margin-bottom: 10px;"></div>
+
+<div class="col-12">
+    <div class="form-floating mb-3">
+        <textarea style="min-height: 100px; width: 100%" class="form-control" id="share-input" rows="10"></textarea>
+        <label for="share-input">Share url</label>
+    </div>
 </div>

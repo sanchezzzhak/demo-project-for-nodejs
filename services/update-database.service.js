@@ -14,7 +14,7 @@ const GOOGLEBOT_CRAWLER_URL = 'https://developers.google.com/search/apis/iprange
 const AMAZON_URL = 'https://ip-ranges.amazonaws.com/ip-ranges.json';
 const VPN_NAME_URL = 'https://raw.githubusercontent.com/az0/vpn_ip/refs/heads/main/data/output/ip.txt';
 
-const COLLECTION_PATH = __dirname + '/database/';
+const COLLECTION_PATH = __dirname + '/../database/';
 
 const TMP_FILE_SPAM_BOT = COLLECTION_PATH + 'tmp-spambot-iplist.txt';
 const TMP_FILE_DATACENTER = COLLECTION_PATH + 'tmp-datacenter-iplist.txt';
@@ -108,16 +108,39 @@ class UpdateDatabaseService extends Service {
 			name: 'update-database',
 			created: this.createdService,
 			events: {
-				async updateIp() {
-					this.processUpdate();
+				async "update-database.updateIp"(ctx) {
+					await this.processUpdate();
 				},
+			},
+			actions: {
+				/**
+				 * get stage process update
+				 * @return {string}
+				 */
+				stage() {
+					return this.getStageResult()
+				},
+				/**
+				 * send bg update task and result stage process
+				 * @return {string}
+				 */
+				update() {
+					this.broker.emit('update-database.updateIp');
+					return this.getStageResult();
+				}
 			},
 		});
 	}
 
-	createdService() {
-
+	getStageResult() {
+		const process = this.stageProcessUpdate;
+		const update = !!this.#readStageUpdate()
+		const lastUpdate = this.#readStageLastUpdate();
+		return JSON.stringify({process, update, lastUpdate});
 	}
+
+
+	createdService() {}
 
 	async processUpdate() {
 		if (this.stageProcessUpdate) {
@@ -126,6 +149,8 @@ class UpdateDatabaseService extends Service {
 		this.stageProcessUpdate = true;
 		if (this.#readStageUpdate()) {
 			await this.#downloads();
+			await this.#prepareSpamIpList()
+			await this.#prepareVpnIpList()
 			await this.#writeStageUpdate();
 		}
 		this.stageProcessUpdate = false;
@@ -144,7 +169,7 @@ class UpdateDatabaseService extends Service {
 		this.broker.logger.info('database download completed')
 	}
 
-	async #prepareSpanIpList() {
+	async #prepareSpamIpList() {
 		this.broker.logger.info('prepare/save vpn list started');
 		const rl = createStreamLine(TMP_FILE_SPAM_BOT);
 		const data = {};
@@ -196,19 +221,36 @@ class UpdateDatabaseService extends Service {
 		this.broker.logger.info('prepare/save vpn list complete');
 	}
 
+	/**
+	 * get date last update database
+	 * @return {Date|null}
+	 */
+	#readStageLastUpdate() {
+		if (!fs.existsSync(FILE_LAST_UPDATE)) {
+			return null;
+		}
+		const stageUpdateData = JSON.parse(fs.readFileSync(FILE_LAST_UPDATE, {encoding: 'utf8'}));
+		return new Date(stageUpdateData.lastUpdate);
+	}
 
+	/**
+	 * get stage need update ?
+	 * @return {boolean}
+	 */
 	#readStageUpdate() {
 		if (!fs.existsSync(FILE_LAST_UPDATE)) {
 			return true;
 		}
 		const currentDate = new Date();
-		const stageUpdateData = JSON.parse(fs.readFileSync(FILE_LAST_UPDATE, {encoding: 'utf8'}));
-		const lastUpdateDate = new Date(stageUpdateData.lastUpdate);
+		const lastUpdateDate = this.#readStageLastUpdate()
 		return currentDate.getDay() !== lastUpdateDate.getDay();
 	}
 
+	/**
+	 * create lock update
+	 */
 	#writeStageUpdate() {
-		const data = { lastUpdate: (new Date()).toISOString()};
+		const data = {lastUpdate: (new Date()).toISOString()};
 		fs.writeFileSync(FILE_LAST_UPDATE, JSON.stringify(data));
 	}
 
